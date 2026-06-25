@@ -6,20 +6,32 @@ const { authMiddleware } = require('../middleware/auth.js');
 const router = express.Router();
 
 const CITY_COORDS = {
-  london: [51.5074, -0.1278],
-  'new york': [40.7128, -74.0060],
-  'san francisco': [37.7749, -122.4194],
-  mumbai: [19.0760, 72.8777],
-  delhi: [28.7041, 77.1025],
-  paris: [48.8566, 2.3522],
-  tokyo: [35.6762, 139.6503],
-  sydney: [-33.8688, 151.2093]
+  bhubaneswar: [20.2961, 85.8245],
+  cuttack: [20.4625, 85.8830],
+  puri: [19.8134, 85.8315],
+  rourkela: [22.2604, 84.8536],
+  sambalpur: [21.4653, 83.9757],
+  berhampur: [19.3000, 84.8500],
+  balasore: [21.4950, 86.9317],
+  angul: [20.8400, 85.1000],
+  bhadrak: [21.0500, 86.5000],
+  jajpur: [20.8500, 86.3333],
+  jagatsinghpur: [20.2700, 86.1700],
+  paradeep: [20.3164, 86.6085],
+  kendrapara: [20.5000, 86.4200],
+  dhenkanal: [20.6621, 85.6000],
+  koraput: [18.8100, 82.7200],
+  keonjhar: [21.6289, 85.5817],
+  baripada: [21.9320, 86.7516],
+  rayagada: [19.1689, 83.4150],
+  jharsuguda: [21.8550, 84.0300],
+  phulbani: [20.4700, 84.2300]
 };
 
 // Seed helper for mock parking garages
 async function seedGaragesForCity(city) {
   const cleanCity = city.trim().toLowerCase();
-  const baseCoords = CITY_COORDS[cleanCity] || [51.5074, -0.1278]; // Fallback to London
+  const baseCoords = CITY_COORDS[cleanCity] || [20.2961, 85.8245]; // Fallback to Bhubaneswar
 
   const garagesToSeed = [
     {
@@ -28,7 +40,7 @@ async function seedGaragesForCity(city) {
       coords: [baseCoords[0] + 0.005, baseCoords[1] - 0.003],
       totalSlots: 60,
       availableSlots: 22,
-      price: 4.5
+      price: 20
     },
     {
       name: `${city.charAt(0).toUpperCase() + city.slice(1)} Park-N-Go Garage`,
@@ -36,7 +48,7 @@ async function seedGaragesForCity(city) {
       coords: [baseCoords[0] - 0.004, baseCoords[1] + 0.006],
       totalSlots: 100,
       availableSlots: 65,
-      price: 3.0
+      price: 15
     },
     {
       name: `${city.charAt(0).toUpperCase() + city.slice(1)} Premium Safe Lot`,
@@ -44,7 +56,7 @@ async function seedGaragesForCity(city) {
       coords: [baseCoords[0] + 0.002, baseCoords[1] + 0.004],
       totalSlots: 40,
       availableSlots: 8,
-      price: 7.0
+      price: 30
     }
   ];
 
@@ -61,6 +73,11 @@ router.get('/', authMiddleware, async (req, res) => {
   const { city } = req.query;
   if (!city) {
     return res.status(400).json({ message: 'City parameter is required' });
+  }
+
+  const cleanCity = city.trim().toLowerCase();
+  if (!CITY_COORDS[cleanCity]) {
+    return res.status(400).json({ message: 'Currently SmartCommute supports only Odisha.' });
   }
 
   try {

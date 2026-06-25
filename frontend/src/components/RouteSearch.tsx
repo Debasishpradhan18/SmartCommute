@@ -9,6 +9,10 @@ interface RouteSearchProps {
   onPlanError: (err: string) => void;
   recentSearches: any[];
   fetchHistory: () => void;
+  source: string;
+  setSource: (val: string) => void;
+  destination: string;
+  setDestination: (val: string) => void;
 }
 
 export default function RouteSearch({
@@ -17,10 +21,12 @@ export default function RouteSearch({
   onPlanStart,
   onPlanError,
   recentSearches,
-  fetchHistory
+  fetchHistory,
+  source,
+  setSource,
+  destination,
+  setDestination
 }: RouteSearchProps) {
-  const [source, setSource] = useState('');
-  const [destination, setDestination] = useState('');
   const [sourceSuggestions, setSourceSuggestions] = useState<string[]>([]);
   const [destSuggestions, setDestSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -127,7 +133,7 @@ export default function RouteSearch({
             <input
               type="text"
               className="search-input-field"
-              placeholder="Enter Start Point (e.g. London)"
+              placeholder="Enter Start Point (e.g. Bhubaneswar)"
               value={source}
               onChange={(e) => setSource(e.target.value)}
               required
@@ -155,7 +161,7 @@ export default function RouteSearch({
             <input
               type="text"
               className="search-input-field"
-              placeholder="Enter Destination (e.g. Mumbai)"
+              placeholder="Enter Destination (e.g. Puri)"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               required

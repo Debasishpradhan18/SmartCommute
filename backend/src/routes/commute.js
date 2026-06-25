@@ -5,15 +5,48 @@ const { authMiddleware } = require('../middleware/auth.js');
 const router = express.Router();
 
 const CITIES = {
-  london: [51.5074, -0.1278],
-  'new york': [40.7128, -74.0060],
-  'san francisco': [37.7749, -122.4194],
-  mumbai: [19.0760, 72.8777],
-  delhi: [28.7041, 77.1025],
-  paris: [48.8566, 2.3522],
-  tokyo: [35.6762, 139.6503],
-  sydney: [-33.8688, 151.2093]
+  bhubaneswar: [20.2961, 85.8245],
+  cuttack: [20.4625, 85.8830],
+  puri: [19.8134, 85.8315],
+  rourkela: [22.2604, 84.8536],
+  sambalpur: [21.4653, 83.9757],
+  berhampur: [19.3000, 84.8500],
+  balasore: [21.4950, 86.9317],
+  angul: [20.8400, 85.1000],
+  bhadrak: [21.0500, 86.5000],
+  jajpur: [20.8500, 86.3333],
+  jagatsinghpur: [20.2700, 86.1700],
+  paradeep: [20.3164, 86.6085],
+  kendrapara: [20.5000, 86.4200],
+  dhenkanal: [20.6621, 85.6000],
+  koraput: [18.8100, 82.7200],
+  keonjhar: [21.6289, 85.5817],
+  baripada: [21.9320, 86.7516],
+  rayagada: [19.1689, 83.4150],
+  jharsuguda: [21.8550, 84.0300],
+  phulbani: [20.4700, 84.2300]
 };
+
+// Odisha validation helper
+function isLocationInOdisha(coords, name) {
+  const [lat, lon] = coords;
+  // Bounding box for Odisha: Latitude 17.0 to 23.0, Longitude 81.0 to 88.0
+  const inBounds = lat >= 17.0 && lat <= 23.0 && lon >= 81.0 && lon <= 88.0;
+  
+  const nameLower = name.toLowerCase();
+  const hasOdishaName = nameLower.includes('odisha') || nameLower.includes('orissa') || nameLower.includes('india');
+  
+  const predefinedCities = [
+    'bhubaneswar', 'cuttack', 'puri', 'rourkela', 'sambalpur',
+    'berhampur', 'balasore', 'angul', 'bhadrak', 'jajpur',
+    'jagatsinghpur', 'paradeep', 'kendrapara', 'dhenkanal', 'koraput',
+    'keonjhar', 'baripada', 'rayagada', 'jharsuguda', 'phulbani'
+  ];
+  
+  const isPredefined = predefinedCities.some(city => nameLower.includes(city));
+  
+  return inBounds && (hasOdishaName || isPredefined);
+}
 
 // Haversine Distance helper
 function getHaversineDistance(coords1, coords2) {
@@ -70,12 +103,12 @@ async function geocodeAddress(query) {
     console.error('OSM Geocoding failed, using fallback:', err.message);
   }
 
-  // 3. Fallback: Return a coordinate relative to London
+  // 3. Fallback: Return a coordinate relative to Bhubaneswar, Odisha
   const randomOffsetLat = (Math.random() - 0.5) * 0.5;
   const randomOffsetLon = (Math.random() - 0.5) * 0.5;
   return {
-    name: query,
-    coords: [51.5074 + randomOffsetLat, -0.1278 + randomOffsetLon]
+    name: query + ", Odisha, India",
+    coords: [20.2961 + randomOffsetLat, 85.8245 + randomOffsetLon]
   };
 }
 
@@ -145,6 +178,11 @@ router.post('/plan', async (req, res) => {
   try {
     const sourceGeocode = await geocodeAddress(source);
     const destGeocode = await geocodeAddress(destination);
+
+    if (!isLocationInOdisha(sourceGeocode.coords, sourceGeocode.name) || 
+        !isLocationInOdisha(destGeocode.coords, destGeocode.name)) {
+      return res.status(400).json({ message: 'Currently SmartCommute supports only Odisha.' });
+    }
 
     const baseDistance = getHaversineDistance(sourceGeocode.coords, destGeocode.coords);
 
@@ -229,36 +267,36 @@ router.post('/plan', async (req, res) => {
     // Mock Carpool Options
     const carpools = [
       {
-        driver: 'Sarah Jenkins',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+        driver: 'Rajesh Mohanty',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
         rating: 4.9,
-        cost: (baseDistance * 0.15).toFixed(2),
+        cost: Math.round(baseDistance * 6), // ₹6 per km
         eta: '5 mins away',
-        vehicle: 'Tesla Model 3'
+        vehicle: 'Tata Nexon EV'
       },
       {
-        driver: 'David Chen',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+        driver: 'Priyanka Patnaik',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
         rating: 4.8,
-        cost: (baseDistance * 0.12).toFixed(2),
+        cost: Math.round(baseDistance * 5), // ₹5 per km
         eta: '8 mins away',
-        vehicle: 'Toyota Prius'
+        vehicle: 'Maruti Suzuki Swift'
       }
     ];
 
     // Mock Parking Options near destination
     const parking = [
       {
-        name: 'Central Plaza Parking',
+        name: 'Smart Multi-Level Parking Lot',
         occupancy: '85%',
-        rate: '$4.50/hr',
+        rate: '₹20/hr',
         distance: '150m walking distance',
         status: 'warning' // full-ish
       },
       {
-        name: 'Park-N-Go Garage',
+        name: 'Biju Patnaik Square Parking',
         occupancy: '40%',
-        rate: '$3.00/hr',
+        rate: '₹15/hr',
         distance: '300m walking distance',
         status: 'success' // plenty space
       }

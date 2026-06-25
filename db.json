@@ -6,47 +6,92 @@
       "password": "$2a$10$wG/ebMNw.nLIYrdWB9m5geblL49bIZAouNceVKx3q.GX8DbQ2xRmC",
       "searchHistory": [
         {
-          "source": "Bhubaneswar, Bhubaneswar Municipal Corporation, Bhubaneswar (M.Corp.), Khordha, Odisha, 751001, India",
-          "destination": "Jagatsinghpur, Jagatsinghapur, Odisha, 754100, India",
-          "distance": "35.8",
-          "duration": 36,
+          "source": "Bhubaneswar, Odisha, India",
+          "destination": "Puri, Odisha, India",
+          "distance": "58.4",
+          "duration": 62,
           "trafficLevel": "low",
-          "id": "97v8yrf",
-          "createdAt": "2026-06-23T18:19:53.429Z"
+          "id": "h1s82ja",
+          "createdAt": "2026-06-25T11:55:00.000Z"
         },
         {
-          "source": "Bhubaneswar, Bhubaneswar Municipal Corporation, Bhubaneswar (M.Corp.), Khordha, Odisha, 751001, India",
-          "destination": "Jagatsinghpur, Jagatsinghapur, Odisha, 754100, India",
-          "distance": "35.8",
-          "duration": 36,
-          "trafficLevel": "low",
-          "id": "4c9a6vo",
-          "createdAt": "2026-06-23T18:33:42.215Z"
+          "source": "Cuttack, Odisha, India",
+          "destination": "Bhubaneswar, Odisha, India",
+          "distance": "26.2",
+          "duration": 38,
+          "trafficLevel": "medium",
+          "id": "j9u28sb",
+          "createdAt": "2026-06-25T11:55:01.000Z"
         },
         {
-          "source": "IMS SUM Hospital, Khandagiri - Chandaka Road, Khandagiri, Ward 23, South West Zone, Bhubaneswar Municipal Corporation, Bhubaneswar (M.Corp.), Khordha, Odisha, 751003, India",
-          "destination": "Fire Station, Meridian, Ada County, Idaho, United States",
-          "distance": "13191.3",
-          "duration": 13191,
+          "source": "Sambalpur, Odisha, India",
+          "destination": "Rourkela, Odisha, India",
+          "distance": "135.5",
+          "duration": 120,
           "trafficLevel": "low",
-          "id": "enax1ho",
-          "createdAt": "2026-06-23T18:40:53.099Z"
+          "id": "k3n28sa",
+          "createdAt": "2026-06-25T11:55:02.000Z"
+        },
+        {
+          "source": "Berhampur, Odisha, India",
+          "destination": "Puri, Odisha, India",
+          "distance": "112.3",
+          "duration": 110,
+          "trafficLevel": "medium",
+          "id": "u8b27sa",
+          "createdAt": "2026-06-25T11:55:03.000Z"
+        },
+        {
+          "source": "Paradeep, Odisha, India",
+          "destination": "Cuttack, Odisha, India",
+          "distance": "82.4",
+          "duration": 90,
+          "trafficLevel": "low",
+          "id": "p8c91sa",
+          "createdAt": "2026-06-25T11:55:04.000Z"
+        },
+        {
+          "source": "Bhubaneswar",
+          "destination": "Cuttack",
+          "distance": "26.2",
+          "duration": 24,
+          "trafficLevel": "low",
+          "id": "nr0v1fv",
+          "createdAt": "2026-06-25T06:26:13.518Z"
         }
       ],
       "createdAt": "2026-06-23T18:19:16.535Z"
+    },
+    {
+      "id": "jtvc92rszph",
+      "email": "test@example.com",
+      "password": "$2a$10$CMGuldSynLOor5BIQLc3/eJPurv3zK7lrGtWQ8ci.Wu.81bQJULQu",
+      "searchHistory": [],
+      "createdAt": "2026-06-25T06:36:08.064Z"
     }
   ],
   "rides": [
     {
       "id": "l5xf8wnxwvd",
       "driver": "pradhandebasish76231@gmail.com",
-      "from": "Railway station ",
-      "to": "college",
+      "from": "Bhubaneswar",
+      "to": "Cuttack",
       "seats": 3,
+      "price": 60,
+      "riders": [],
+      "messages": [],
+      "createdAt": "2026-06-25T11:55:00.000Z"
+    },
+    {
+      "id": "r9a28snw7sb",
+      "driver": "pradhandebasish76231@gmail.com",
+      "from": "Cuttack",
+      "to": "Bhubaneswar",
+      "seats": 2,
       "price": 50,
       "riders": [],
       "messages": [],
-      "createdAt": "2026-06-23T18:32:31.907Z"
+      "createdAt": "2026-06-25T11:55:01.000Z"
     }
   ]
 }

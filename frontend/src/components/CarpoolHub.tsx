@@ -190,7 +190,7 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
                       {ride.from} → {ride.to}
                     </span>
                     <span style={{ fontSize: '13px', color: 'var(--traffic-low)', fontWeight: 700 }}>
-                      ${ride.price}
+                      ₹{ride.price}
                     </span>
                   </div>
                   
@@ -267,7 +267,7 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
               />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Price ($)</label>
+              <label className="form-label">Price (₹)</label>
               <input
                 type="number"
                 min="0"
@@ -322,7 +322,7 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                        Price: ${ride.price} • {ride.seats} seats remaining
+                        Price: ₹{ride.price} • {ride.seats} seats remaining
                       </span>
                       <button
                         className="logout-btn"

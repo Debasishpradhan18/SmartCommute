@@ -22,6 +22,10 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Lifted state to allow MapView city marker clicks to set input values
+  const [sourceInput, setSourceInput] = useState('');
+  const [destInput, setDestInput] = useState('');
+
   // Chat window state
   const [chatRideId, setChatRideId] = useState<string | null>(null);
   const [chatRideTitle, setChatRideTitle] = useState<string>('');
@@ -71,7 +75,7 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
       <header className="dashboard-header glass-panel">
         <div className="logo-section">
           <span className="logo-icon">🚦</span>
-          <span className="logo-text">SmartCommute</span>
+          <span className="logo-text">SmartCommute Odisha</span>
         </div>
         <div className="user-profile">
           <span className="user-email">{user.email}</span>
@@ -81,6 +85,60 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
           </button>
         </div>
       </header>
+
+      {/* Odisha Smart Mobility Live Telemetry */}
+      <div style={{
+        background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.05) 0%, rgba(57, 255, 20, 0.02) 100%)',
+        borderBottom: '1px solid var(--glass-border)',
+        padding: '10px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
+        zIndex: 5
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            background: 'var(--traffic-low)',
+            borderRadius: '50%',
+            boxShadow: '0 0 8px var(--traffic-low)',
+            display: 'inline-block',
+            animation: 'pulseStatus 2s infinite ease-in-out'
+          }}></span>
+          <style>{`
+            @keyframes pulseStatus {
+              0% { opacity: 0.5; }
+              50% { opacity: 1; }
+              100% { opacity: 0.5; }
+            }
+          `}</style>
+          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
+            ODISHA TRANSIT GRID: ACTIVE
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>AVG CONGESTION:</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--traffic-medium)' }}>34% (MODERATE)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MONITORED VEHICLES:</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff' }}>4,812</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>CO2 SAVED TODAY:</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--traffic-low)' }}>1,840 kg</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MO BUS RUNNING:</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-color)' }}>124 Fleet</span>
+          </div>
+        </div>
+      </div>
 
       <div className="dashboard-grid">
         <aside className="sidebar-panel">
@@ -169,6 +227,10 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
                 onPlanError={handlePlanError}
                 recentSearches={recentSearches}
                 fetchHistory={fetchHistory}
+                source={sourceInput}
+                setSource={setSourceInput}
+                destination={destInput}
+                setDestination={setDestInput}
               />
 
               {error && (
@@ -256,6 +318,8 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
             routes={routeData ? routeData.routes : []}
             selectedRouteIndex={selectedRouteIdx}
             onSelectRoute={setSelectedRouteIdx}
+            onSelectSource={setSourceInput}
+            onSelectDestination={setDestInput}
           />
           
           {sidebarTab === 'route' && (

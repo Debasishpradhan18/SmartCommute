@@ -5,6 +5,43 @@ const { authMiddleware } = require('../middleware/auth.js');
 
 const router = express.Router();
 
+// Helper to check if location is in Odisha
+async function validateLocationInOdisha(locationName) {
+  const clean = locationName.trim().toLowerCase();
+  const predefinedCities = [
+    'bhubaneswar', 'cuttack', 'puri', 'rourkela', 'sambalpur',
+    'berhampur', 'balasore', 'angul', 'bhadrak', 'jajpur',
+    'jagatsinghpur', 'paradeep', 'kendrapara', 'dhenkanal', 'koraput',
+    'keonjhar', 'baripada', 'rayagada', 'jharsuguda', 'phulbani'
+  ];
+  
+  // 1. Text match with predefined cities
+  const matched = predefinedCities.some(city => clean.includes(city));
+  if (matched) return true;
+  
+  // 2. Text match with "odisha" or "orissa"
+  if (clean.includes('odisha') || clean.includes('orissa')) return true;
+  
+  // 3. Call geocoder
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&limit=1`;
+    const response = await fetch(url, { headers: { 'User-Agent': 'SmartCommuteApp/1.0' } });
+    const data = await response.json();
+    if (data && data.length > 0) {
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      const displayName = data[0].display_name.toLowerCase();
+      
+      const inBounds = lat >= 17.0 && lat <= 23.0 && lon >= 81.0 && lon <= 88.0;
+      const hasOdisha = displayName.includes('odisha') || displayName.includes('orissa');
+      return inBounds || hasOdisha;
+    }
+  } catch (err) {
+    console.error('Ride geocoding check failed:', err.message);
+  }
+  return false;
+}
+
 // POST / - Create a new ride offer
 router.post('/', authMiddleware, async (req, res) => {
   const { from, to, seats, price } = req.body;
@@ -14,6 +51,12 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 
   try {
+    const fromValid = await validateLocationInOdisha(from);
+    const toValid = await validateLocationInOdisha(to);
+    if (!fromValid || !toValid) {
+      return res.status(400).json({ message: 'Currently SmartCommute supports only Odisha.' });
+    }
+
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

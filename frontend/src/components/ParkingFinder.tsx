@@ -177,7 +177,7 @@ export default function ParkingFinder({ token }: ParkingFinderProps) {
                         {garage.name}
                       </span>
                       <span style={{ fontSize: '13px', color: 'var(--traffic-low)', fontWeight: 700 }}>
-                        ${garage.price.toFixed(2)}/hr
+                        ₹{garage.price.toFixed(2)}/hr
                       </span>
                     </div>
 

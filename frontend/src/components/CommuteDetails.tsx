@@ -182,7 +182,7 @@ export default function CommuteDetails({
                     </div>
                   </div>
                   <div className="driver-pricing">
-                    <div className="driver-cost">${driver.cost}</div>
+                    <div className="driver-cost">₹{driver.cost}</div>
                     <button style={{
                       marginTop: '4px',
                       background: 'var(--accent-color)',

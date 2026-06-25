@@ -3,28 +3,31 @@
   --font-heading: 'Plus Jakarta Sans', sans-serif;
 
   /* Theme colors - Ultra Dark Slate & Neon Details */
-  --bg-primary: #0B0F19;
-  --bg-secondary: #111827;
-  --bg-tertiary: #1F2937;
+  --bg-primary: #050811;
+  --bg-secondary: #0b1120;
+  --bg-tertiary: #152238;
   
-  --glass-bg: rgba(17, 24, 39, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
+  --glass-bg: rgba(11, 17, 32, 0.65);
+  --glass-border: rgba(0, 240, 255, 0.15);
+  --glass-highlight: rgba(0, 240, 255, 0.03);
 
-  --text-primary: #F3F4F6;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --text-primary: #f0f7ff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
 
-  --accent-color: #6366F1; /* Indigo */
-  --accent-hover: #4F46E5;
-  --accent-glow: rgba(99, 102, 241, 0.2);
+  --accent-color: #00f0ff; /* Neon Cyan */
+  --accent-hover: #00d0e6;
+  --accent-glow: rgba(0, 240, 255, 0.25);
+  
+  --accent-green: #39ff14; /* Neon Green */
+  --accent-green-glow: rgba(57, 255, 20, 0.25);
 
   /* Traffic colors */
-  --traffic-low: #10B981;    /* Emerald green */
-  --traffic-medium: #F59E0B; /* Amber yellow */
-  --traffic-heavy: #EF4444;  /* Red */
+  --traffic-low: #39ff14;    /* Neon Green */
+  --traffic-medium: #ffd700; /* Neon Gold/Yellow */
+  --traffic-heavy: #ff0055;  /* Neon Cyber Pink/Red */
   
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
@@ -72,21 +75,21 @@ h1, h2, h3, h4, h5, h6 {
 /* Glassmorphism Classes */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-lg);
 }
 
-/* Beautiful custom tile styling for dark map */
+/* Beautiful custom tile styling for futuristic dark map */
 .dark-map .leaflet-tile-container {
-  filter: invert(100%) hue-rotate(180deg) brightness(90%) contrast(90%);
+  filter: hue-rotate(200deg) brightness(0.8) contrast(1.2) saturate(1.3);
 }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background-color: #0f1420 !important;
+  background-color: #03060d !important;
 }
 
 .leaflet-bar {
