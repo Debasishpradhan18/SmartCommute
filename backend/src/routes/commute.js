@@ -67,26 +67,22 @@ function getHaversineDistance(coords1, coords2) {
 async function geocodeAddress(query) {
   const cleanQuery = query.trim().toLowerCase();
 
-  // 1. Try local dictionary
-  if (CITIES[cleanQuery]) {
+  // 1. Try local dictionary (exact or normalized match)
+  const normalizedQuery = cleanQuery.replace(/,?\s*(odisha|orissa|india)/g, '').trim();
+  if (CITIES[normalizedQuery]) {
     return {
-      name: query,
-      coords: CITIES[cleanQuery]
+      name: normalizedQuery.charAt(0).toUpperCase() + normalizedQuery.slice(1),
+      coords: CITIES[normalizedQuery]
     };
-  }
-
-  for (const city of Object.keys(CITIES)) {
-    if (cleanQuery.includes(city) || city.includes(cleanQuery)) {
-      return {
-        name: city.toUpperCase(),
-        coords: CITIES[city]
-      };
-    }
   }
 
   // 2. Try Nominatim public API (no key required, but with fallback)
   try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+    let searchQuery = query;
+    if (!searchQuery.toLowerCase().includes('odisha') && !searchQuery.toLowerCase().includes('orissa')) {
+      searchQuery = `${query}, Odisha, India`;
+    }
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=1`;
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'SmartCommuteApp/1.0'
@@ -189,7 +185,7 @@ router.post('/plan', async (req, res) => {
     // Attempt to fetch real routing from OSRM
     let osrmRoutes = [];
     try {
-      const osrmUrl = `http://router.project-osrm.org/route/v1/driving/${sourceGeocode.coords[1]},${sourceGeocode.coords[0]};${destGeocode.coords[1]},${destGeocode.coords[0]}?overview=full&geometries=geojson&alternatives=true`;
+      const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${sourceGeocode.coords[1]},${sourceGeocode.coords[0]};${destGeocode.coords[1]},${destGeocode.coords[0]}?overview=full&geometries=geojson&alternatives=true`;
       const response = await fetch(osrmUrl);
       const data = await response.json();
       if (data && data.code === 'Ok' && data.routes && data.routes.length > 0) {
@@ -272,7 +268,8 @@ router.post('/plan', async (req, res) => {
         rating: 4.9,
         cost: Math.round(baseDistance * 6), // ₹6 per km
         eta: '5 mins away',
-        vehicle: 'Tata Nexon EV'
+        vehicle: 'Tata Nexon EV',
+        coords: [sourceGeocode.coords[0] + 0.003, sourceGeocode.coords[1] - 0.002]
       },
       {
         driver: 'Priyanka Patnaik',
@@ -280,7 +277,8 @@ router.post('/plan', async (req, res) => {
         rating: 4.8,
         cost: Math.round(baseDistance * 5), // ₹5 per km
         eta: '8 mins away',
-        vehicle: 'Maruti Suzuki Swift'
+        vehicle: 'Maruti Suzuki Swift',
+        coords: [sourceGeocode.coords[0] - 0.002, sourceGeocode.coords[1] + 0.004]
       }
     ];
 
@@ -291,14 +289,16 @@ router.post('/plan', async (req, res) => {
         occupancy: '85%',
         rate: '₹20/hr',
         distance: '150m walking distance',
-        status: 'warning' // full-ish
+        status: 'warning', // full-ish
+        coords: [destGeocode.coords[0] + 0.002, destGeocode.coords[1] - 0.002]
       },
       {
         name: 'Biju Patnaik Square Parking',
         occupancy: '40%',
         rate: '₹15/hr',
         distance: '300m walking distance',
-        status: 'success' // plenty space
+        status: 'success', // plenty space
+        coords: [destGeocode.coords[0] - 0.003, destGeocode.coords[1] + 0.003]
       }
     ];
 

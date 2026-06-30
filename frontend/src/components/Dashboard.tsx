@@ -30,6 +30,16 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
   const [chatRideId, setChatRideId] = useState<string | null>(null);
   const [chatRideTitle, setChatRideTitle] = useState<string>('');
 
+  // Lifted state to plot searched parking garages on the map
+  const [searchedGarages, setSearchedGarages] = useState<any[]>([]);
+
+  // Clear temporary searched garages when switching tabs to avoid visual clutter
+  useEffect(() => {
+    if (sidebarTab !== 'parking') {
+      setSearchedGarages([]);
+    }
+  }, [sidebarTab]);
+
   const fetchHistory = async () => {
     try {
       const res = await fetch(`${API_URL}/api/commute/history`, {
@@ -307,6 +317,7 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
           {sidebarTab === 'parking' && (
             <ParkingFinder 
               token={token} 
+              onSearchSuccess={setSearchedGarages}
             />
           )}
         </aside>
@@ -320,6 +331,9 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
             onSelectRoute={setSelectedRouteIdx}
             onSelectSource={setSourceInput}
             onSelectDestination={setDestInput}
+            carpools={routeData ? routeData.carpools : []}
+            parking={routeData ? routeData.parking : []}
+            searchedGarages={sidebarTab === 'parking' ? searchedGarages : []}
           />
           
           {sidebarTab === 'route' && (

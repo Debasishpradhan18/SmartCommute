@@ -4,9 +4,10 @@ import { API_URL } from '../config';
 
 interface ParkingFinderProps {
   token: string;
+  onSearchSuccess: (garages: any[]) => void;
 }
 
-export default function ParkingFinder({ token }: ParkingFinderProps) {
+export default function ParkingFinder({ token, onSearchSuccess }: ParkingFinderProps) {
   const [activeTab, setActiveTab] = useState<'find' | 'reservations'>('find');
   const [city, setCity] = useState('');
   const [garages, setGarages] = useState<any[]>([]);
@@ -47,6 +48,7 @@ export default function ParkingFinder({ token }: ParkingFinderProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to find parking');
       setGarages(data);
+      onSearchSuccess(data);
     } catch (err: any) {
       setError(err.message || 'Error searching parking garages');
     } finally {
@@ -66,9 +68,11 @@ export default function ParkingFinder({ token }: ParkingFinderProps) {
       if (!res.ok) throw new Error(data.message || 'Reservation failed');
 
       // Update state for garages
-      setGarages(prev =>
-        prev.map(g => (g._id === garageId ? data.garage : g))
-      );
+      setGarages(prev => {
+        const updated = prev.map(g => (g._id === garageId ? data.garage : g));
+        onSearchSuccess(updated);
+        return updated;
+      });
       setSuccess(`Spot reserved successfully! Ticket: ${data.booking.slotNumber}`);
       fetchReservations(); // Refresh reservation list
     } catch (err: any) {
@@ -98,7 +102,10 @@ export default function ParkingFinder({ token }: ParkingFinderProps) {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const freshData = await freshRes.json();
-        if (freshRes.ok) setGarages(freshData);
+        if (freshRes.ok) {
+          setGarages(freshData);
+          onSearchSuccess(freshData);
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Error cancelling reservation');
@@ -147,7 +154,7 @@ export default function ParkingFinder({ token }: ParkingFinderProps) {
             <input
               type="text"
               className="search-input-field"
-              placeholder="Enter City Name (e.g. London)"
+              placeholder="Enter Odisha City (e.g. Cuttack)"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               style={{ padding: '10px 12px 10px 38px' }}

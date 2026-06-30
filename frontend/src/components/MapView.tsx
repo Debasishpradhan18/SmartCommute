@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Layers, Activity, MapPin, Eye, EyeOff } from 'lucide-react';
+import { Layers, Activity, MapPin, Eye, EyeOff, Globe, Map, Sun, Moon } from 'lucide-react';
 
 interface MapViewProps {
   source: { name: string; coords: [number, number] } | null;
@@ -12,6 +12,9 @@ interface MapViewProps {
   onSelectRoute: (index: number) => void;
   onSelectSource?: (name: string) => void;
   onSelectDestination?: (name: string) => void;
+  carpools?: any[];
+  parking?: any[];
+  searchedGarages?: any[];
 }
 
 // Odisha bounds as requested
@@ -171,6 +174,75 @@ const EMERGENCY_LOCATIONS = [
   { name: 'NH-16 Highway EV Charger', type: 'charging', coords: [20.4420, 85.8900], city: 'Cuttack', speed: '60 kW Dual Fast' },
   { name: 'NH-53 EV Charging Station', type: 'charging', coords: [21.4550, 83.9600], city: 'Sambalpur', speed: '50 kW Fast' }
 ];
+
+// Map Styles Configurations
+const MAP_TILES = {
+  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  street: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+};
+
+const MAP_ATTRIBUTIONS = {
+  dark: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  light: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  street: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  satellite: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+};
+
+// Helper component to force map size invalidation on render & theme switch
+function MapResizeTrigger({ mapStyle }: { mapStyle: string }) {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [map, mapStyle]);
+  return null;
+}
+
+const createCarIcon = (driverName: string) => {
+  return L.divIcon({
+    className: 'carpool-car-marker',
+    html: `
+      <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;">
+        <div style="
+          background-color: var(--accent-green);
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          border: 2px solid #ffffff;
+          box-shadow: 0 0 10px var(--accent-green);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          z-index: 2;
+        ">🚗</div>
+        <div style="
+          position: absolute;
+          width: 32px;
+          height: 32px;
+          background-color: var(--accent-green);
+          opacity: 0.35;
+          border-radius: 50%;
+          animation: mapPulse 2s infinite ease-in-out;
+          z-index: 1;
+        "></div>
+      </div>
+      <style>
+        @keyframes mapPulse {
+          0% { transform: scale(0.5); opacity: 0.7; }
+          100% { transform: scale(1.4); opacity: 0; }
+        }
+      </style>
+    `,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13]
+  });
+};
 
 // Custom icons using inline style for 100% reliability
 const createPinIcon = (color: string) => {
@@ -340,7 +412,10 @@ export default function MapView({
   selectedRouteIndex,
   onSelectRoute,
   onSelectSource,
-  onSelectDestination
+  onSelectDestination,
+  carpools = [],
+  parking = [],
+  searchedGarages = []
 }: MapViewProps) {
   // Layer toggles
   const [showHighways, setShowHighways] = useState(true);
@@ -349,6 +424,9 @@ export default function MapView({
   const [showCities, setShowCities] = useState(true);
   const [showHubs, setShowHubs] = useState(true);
   const [showEmergency, setShowEmergency] = useState(true);
+
+  // Map Style Selector State
+  const [mapStyle, setMapStyle] = useState<'dark' | 'light' | 'street' | 'satellite'>('dark');
 
   // Compute map bounds if route is available
   let bounds: L.LatLngBoundsExpression | null = null;
@@ -360,7 +438,7 @@ export default function MapView({
   }
 
   return (
-    <div className="map-container dark-map">
+    <div className={`map-container ${mapStyle === 'dark' ? 'dark-map' : ''}`}>
       {/* Floating Control Panel for Overlays */}
       <div style={{
         position: 'absolute',
@@ -374,7 +452,97 @@ export default function MapView({
         flexDirection: 'column',
         gap: '10px'
       }} className="glass-panel">
+        {/* Map Style Selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '6px' }}>
+          <Globe size={14} style={{ color: 'var(--accent-color)' }} />
+          <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Map Style</span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '6px' }}>
+          <button
+            onClick={() => setMapStyle('dark')}
+            style={{
+              background: mapStyle === 'dark' ? 'var(--bg-tertiary)' : 'rgba(0,0,0,0.2)',
+              border: mapStyle === 'dark' ? '1px solid var(--accent-color)' : '1px solid var(--glass-border)',
+              borderRadius: '6px',
+              color: '#ffffff',
+              padding: '6px 4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Moon size={10} /> Dark
+          </button>
+          <button
+            onClick={() => setMapStyle('light')}
+            style={{
+              background: mapStyle === 'light' ? 'var(--bg-tertiary)' : 'rgba(0,0,0,0.2)',
+              border: mapStyle === 'light' ? '1px solid var(--accent-color)' : '1px solid var(--glass-border)',
+              borderRadius: '6px',
+              color: '#ffffff',
+              padding: '6px 4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Sun size={10} /> Light
+          </button>
+          <button
+            onClick={() => setMapStyle('street')}
+            style={{
+              background: mapStyle === 'street' ? 'var(--bg-tertiary)' : 'rgba(0,0,0,0.2)',
+              border: mapStyle === 'street' ? '1px solid var(--accent-color)' : '1px solid var(--glass-border)',
+              borderRadius: '6px',
+              color: '#ffffff',
+              padding: '6px 4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Map size={10} /> Street
+          </button>
+          <button
+            onClick={() => setMapStyle('satellite')}
+            style={{
+              background: mapStyle === 'satellite' ? 'var(--bg-tertiary)' : 'rgba(0,0,0,0.2)',
+              border: mapStyle === 'satellite' ? '1px solid var(--accent-color)' : '1px solid var(--glass-border)',
+              borderRadius: '6px',
+              color: '#ffffff',
+              padding: '6px 4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Globe size={10} /> Satellite
+          </button>
+        </div>
+
+        {/* Map Overlays */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '6px', marginTop: '4px' }}>
           <Layers size={14} style={{ color: 'var(--accent-color)' }} />
           <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Map Overlays</span>
         </div>
@@ -518,9 +686,10 @@ export default function MapView({
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
+        <MapResizeTrigger mapStyle={mapStyle} />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution={MAP_ATTRIBUTIONS[mapStyle]}
+          url={MAP_TILES[mapStyle]}
         />
 
         {/* Selected custom route endpoints */}
@@ -731,6 +900,71 @@ export default function MapView({
             </Popup>
           </Marker>
         ))}
+
+        {/* Route-Specific Matched Carpools */}
+        {carpools.map((driver, idx) => {
+          if (!driver.coords) return null;
+          return (
+            <Marker key={`carpool-driver-${idx}`} position={driver.coords as [number, number]} icon={createCarIcon(driver.driver)}>
+              <Popup>
+                <div style={{ color: '#0b1120', fontFamily: 'sans-serif', width: '180px' }}>
+                  <h4 style={{ margin: '0 0 2px 0', fontSize: '12px', color: '#0f172a' }}>{driver.driver}</h4>
+                  <span style={{ fontSize: '10px', color: 'var(--traffic-low)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>🚗 Active Carpool Driver</span>
+                  <div style={{ fontSize: '11px', marginBottom: '6px' }}>
+                    <span>Vehicle: <strong>{driver.vehicle}</strong></span><br/>
+                    <span>Rating: <strong>⭐ {driver.rating}</strong></span><br/>
+                    <span>ETA: <strong>{driver.eta}</strong></span>
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center', marginTop: '4px', fontStyle: 'italic' }}>
+                    Book via Route Details tab
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
+        {/* Route-Specific Destination Parking Options */}
+        {parking.map((spot, idx) => {
+          if (!spot.coords) return null;
+          return (
+            <Marker key={`route-parking-${idx}`} position={spot.coords as [number, number]} icon={createParkingIcon()}>
+              <Popup>
+                <div style={{ color: '#0b1120', fontFamily: 'sans-serif', width: '180px' }}>
+                  <h4 style={{ margin: '0 0 2px 0', fontSize: '12px', color: '#0f172a' }}>{spot.name}</h4>
+                  <span style={{ fontSize: '10px', color: 'var(--accent-color)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>🎯 Destination Parking</span>
+                  <div style={{ fontSize: '11px', marginBottom: '6px' }}>
+                    <span>Occupancy: <strong>{spot.occupancy}</strong></span><br/>
+                    <span>Pricing: <strong>{spot.rate}</strong></span><br/>
+                    <span>Distance: <strong>{spot.distance}</strong></span>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
+        {/* Search-tab Live Garages */}
+        {searchedGarages.map((garage) => {
+          if (!garage.coords) return null;
+          return (
+            <Marker key={garage._id} position={garage.coords as [number, number]} icon={createParkingIcon()}>
+              <Popup>
+                <div style={{ color: '#0b1120', fontFamily: 'sans-serif', width: '180px' }}>
+                  <h4 style={{ margin: '0 0 2px 0', fontSize: '12px', color: '#0f172a' }}>{garage.name}</h4>
+                  <span style={{ fontSize: '10px', color: 'var(--traffic-low)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>🅿️ Smart Garage</span>
+                  <div style={{ fontSize: '11px', marginBottom: '6px' }}>
+                    <span>Available: <strong>{garage.availableSlots} / {garage.totalSlots}</strong> slots</span><br/>
+                    <span>Rate: <strong>₹{garage.price}/hr</strong></span>
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center', marginTop: '4px', fontStyle: 'italic' }}>
+                    Book via Parking Sidebar panel
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
         <ChangeView bounds={bounds} />
       </MapContainer>
