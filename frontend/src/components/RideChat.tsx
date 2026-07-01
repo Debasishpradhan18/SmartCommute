@@ -77,10 +77,19 @@ export default function RideChat({ rideId, rideTitle, token, userEmail, onClose 
     <div className="chat-widget glass-panel">
       <div className="chat-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <MessageCircle size={16} style={{ color: 'var(--accent-color)' }} />
+          <span style={{
+            width: '6px',
+            height: '6px',
+            background: 'var(--traffic-low)',
+            borderRadius: '50%',
+            boxShadow: '0 0 6px var(--traffic-low)',
+            display: 'inline-block',
+            animation: 'pulseStatus 1.5s infinite ease-in-out'
+          }}></span>
+          <MessageCircle size={15} style={{ color: 'var(--accent-color)' }} />
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>Ride Chat</div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{rideTitle}</div>
+            <div style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>Ride Chat Gateway</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{rideTitle}</div>
           </div>
         </div>
         <button className="chat-close-btn" onClick={onClose}>

@@ -1,36 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap');
+
 :root {
   --font-main: 'Inter', sans-serif;
   --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
 
-  /* Theme colors - Ultra Dark Slate & Neon Details */
-  --bg-primary: #050811;
-  --bg-secondary: #0b1120;
-  --bg-tertiary: #152238;
+  /* Theme colors - Deep Tech Space & Futuristic Neons */
+  --bg-primary: #02040a;      /* Deep black-slate */
+  --bg-secondary: #070d19;    /* Dark tech slate */
+  --bg-tertiary: #0e172a;     /* Slate block background */
+  --bg-card: #0b1220;         /* Card slate base */
   
-  --glass-bg: rgba(11, 17, 32, 0.65);
-  --glass-border: rgba(0, 240, 255, 0.15);
-  --glass-highlight: rgba(0, 240, 255, 0.03);
+  /* Glassmorphism System */
+  --glass-bg: rgba(7, 13, 25, 0.7);
+  --glass-border: rgba(0, 240, 255, 0.12);
+  --glass-highlight: rgba(0, 240, 255, 0.02);
+  --glass-glow: rgba(0, 240, 255, 0.05);
 
-  --text-primary: #f0f7ff;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  /* Typography */
+  --text-primary: #f1f5f9;    /* Clean white-grey */
+  --text-secondary: #94a3b8;  /* Light slate secondary */
+  --text-muted: #475569;      /* Darker grey muted text */
 
-  --accent-color: #00f0ff; /* Neon Cyan */
-  --accent-hover: #00d0e6;
-  --accent-glow: rgba(0, 240, 255, 0.25);
+  /* Cyber Accents */
+  --accent-color: #00f0ff;       /* Cyber Neon Cyan */
+  --accent-hover: #38bdf8;       /* Hover Soft Cyan */
+  --accent-glow: rgba(0, 240, 255, 0.3);
+  --accent-glow-intense: rgba(0, 240, 255, 0.6);
   
-  --accent-green: #39ff14; /* Neon Green */
+  --accent-purple: #818cf8;      /* Indigo Cyber */
+  --accent-purple-glow: rgba(129, 140, 248, 0.3);
+
+  --accent-green: #10b981;       /* Smart Green */
+  --accent-green-neon: #39ff14;  /* Bright Neon Green */
   --accent-green-glow: rgba(57, 255, 20, 0.25);
 
-  /* Traffic colors */
-  --traffic-low: #39ff14;    /* Neon Green */
-  --traffic-medium: #ffd700; /* Neon Gold/Yellow */
-  --traffic-heavy: #ff0055;  /* Neon Cyber Pink/Red */
+  /* Traffic Status Colors */
+  --traffic-low: #39ff14;         /* Green smooth flow */
+  --traffic-medium: #eab308;      /* Yellow warning */
+  --traffic-heavy: #ff0055;       /* Cyber pink/red congestion */
   
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 8px 16px -8px rgba(0, 0, 0, 0.7);
+  --shadow-neon: 0 0 15px rgba(0, 240, 255, 0.15);
+  
+  --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
+  
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -45,12 +64,23 @@ body {
   font-family: var(--font-main);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.03) 0%, transparent 45%);
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: #FFFFFF;
+}
+
+/* Monospace Readouts */
+.mono-text {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
 }
 
 /* Custom Scrollbar */
@@ -66,43 +96,102 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb {
   background: var(--bg-tertiary);
   border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
 
-/* Glassmorphism Classes */
+/* Futuristic Glass Panel Styling */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), var(--shadow-neon);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Beautiful custom tile styling for futuristic dark map */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(0, 240, 255, 0.25) 50%, rgba(255, 255, 255, 0) 100%);
+  z-index: 1;
+}
+
+/* Dark Map Styling Override */
 .dark-map .leaflet-tile-container {
-  filter: hue-rotate(200deg) brightness(0.8) contrast(1.2) saturate(1.3);
+  filter: invert(100%) hue-rotate(180deg) brightness(0.9) contrast(1.1) saturate(0.85);
 }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background-color: #03060d !important;
+  background-color: #03060c !important;
 }
 
 .leaflet-bar {
   border: 1px solid var(--glass-border) !important;
   box-shadow: var(--shadow-lg) !important;
+  border-radius: var(--radius-sm) !important;
+  overflow: hidden;
 }
 
 .leaflet-bar a {
   background-color: var(--bg-secondary) !important;
   color: var(--text-primary) !important;
   border-bottom: 1px solid var(--glass-border) !important;
+  transition: all 0.2s ease !important;
 }
 
 .leaflet-bar a:hover {
   background-color: var(--bg-tertiary) !important;
+  color: var(--accent-color) !important;
+}
+
+/* Animations */
+@keyframes pulseStatus {
+  0% { transform: scale(0.95); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.4; }
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 5px rgba(0, 240, 255, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.45); }
+  100% { box-shadow: 0 0 5px rgba(0, 240, 255, 0.2); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes radarScan {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

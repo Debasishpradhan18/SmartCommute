@@ -54,12 +54,59 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
 
   return (
     <div className="auth-wrapper">
-      <div className="auth-card glass-panel">
+      {/* Decorative Cyber Grid elements */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        left: '5%',
+        fontSize: '11px',
+        color: 'var(--text-muted)',
+        fontFamily: 'var(--font-mono)',
+        pointerEvents: 'none',
+        opacity: 0.5
+      }}>
+        SYS_GATEWAY: ACTIVE<br />
+        SECURE_PROTOCOL: TLS_1.3<br />
+        ODISHA_GRID: 85.09E / 20.95N
+      </div>
+      <div style={{
+        position: 'absolute',
+        bottom: '10%',
+        right: '5%',
+        fontSize: '11px',
+        color: 'var(--text-muted)',
+        fontFamily: 'var(--font-mono)',
+        pointerEvents: 'none',
+        opacity: 0.5,
+        textAlign: 'right'
+      }}>
+        NODE_STATUS: SHIELD_ON<br />
+        TRANSIT_DB: LOCAL_FALLBACK<br />
+        v1.2.4_PROT
+      </div>
+
+      <div className="auth-card glass-panel animate-slide-up">
         <div className="auth-header">
-          <h1 className="auth-title">
-            <span className="logo-icon">🚦</span> SmartCommute
+          <div style={{
+            width: '60px',
+            height: '60px',
+            background: 'radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%)',
+            border: '1.5px solid var(--glass-border)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px auto',
+            boxShadow: '0 0 15px rgba(0, 240, 255, 0.1)'
+          }}>
+            <span className="logo-icon" style={{ fontSize: '28px', animation: 'pulseStatus 2s infinite ease-in-out' }}>🚦</span>
+          </div>
+          <h1 className="auth-title" style={{ fontFamily: 'var(--font-heading)' }}>
+            SmartCommute
           </h1>
-          <p className="auth-subtitle">Urban commuting made faster, cheaper, and greener</p>
+          <p className="auth-subtitle" style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            Odisha Urban Mobility Portal
+          </p>
         </div>
 
         <div className="auth-tabs">
@@ -68,14 +115,14 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             onClick={() => { setIsLogin(true); setError(''); }}
             type="button"
           >
-            Login
+            🔒 Sign In
           </button>
           <button 
             className={`auth-tab ${!isLogin ? 'active' : ''}`}
             onClick={() => { setIsLogin(false); setError(''); }}
             type="button"
           >
-            Register
+            🔑 Register
           </button>
         </div>
 

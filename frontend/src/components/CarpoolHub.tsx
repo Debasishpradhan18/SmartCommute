@@ -178,41 +178,41 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>Searching rides...</div>
+            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>Searching active grid...</div>
           ) : joinableRides.length === 0 ? (
-            <div className="empty-state">No available rides offered matching your search.</div>
+            <div className="empty-state">No commuter ride-shares are registered in this sector.</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '350px', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '350px', overflowY: 'auto' }} className="animate-fade-in">
               {joinableRides.map(ride => (
-                <div key={ride._id} className="history-item" style={{ cursor: 'default' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>
-                      {ride.from} → {ride.to}
+                <div key={ride._id} className="history-item animate-slide-up" style={{ cursor: 'default' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>
+                      🚗 {ride.from} → {ride.to}
                     </span>
-                    <span style={{ fontSize: '13px', color: 'var(--traffic-low)', fontWeight: 700 }}>
+                    <span className="mono-text" style={{ fontSize: '14px', color: 'var(--traffic-low)', fontWeight: 800 }}>
                       ₹{ride.price}
                     </span>
                   </div>
                   
-                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-                    Driver: {ride.driver.split('@')[0]}
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                    👤 pilot: {ride.driver.split('@')[0]}
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}>
-                      <Users size={14} />
-                      {ride.seats} seats left
+                    <span style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
+                      <Users size={14} style={{ color: 'var(--accent-color)' }} />
+                      {ride.seats} slots left
                     </span>
                     <button
-                      className="logout-btn"
+                      className="plan-btn"
                       onClick={() => handleJoinRide(ride._id)}
                       style={{
-                        background: 'var(--accent-color)',
-                        borderColor: 'transparent',
-                        padding: '4px 12px',
+                        width: 'auto',
+                        padding: '6px 14px',
                         fontSize: '11px',
-                        fontWeight: 700,
-                        color: '#FFFFFF'
+                        borderRadius: '6px',
+                        boxShadow: 'none',
+                        height: '30px'
                       }}
                     >
                       Join Ride
@@ -226,39 +226,40 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
       )}
 
       {activeTab === 'offer' && (
-        <form onSubmit={handleOfferRide} className="glass-panel" style={{ padding: '16px', borderRadius: '12px' }}>
-          <div className="form-group" style={{ marginBottom: '14px' }}>
-            <label className="form-label">From</label>
+        <form onSubmit={handleOfferRide} className="glass-panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
+          <div className="form-group" style={{ marginBottom: '16px' }}>
+            <label className="form-label">Departure Hub (From)</label>
             <input
               type="text"
               className="form-input"
               style={{ paddingLeft: '14px' }}
-              placeholder="e.g. College"
+              placeholder="e.g. Patia, Bhubaneswar"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
               required
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: '14px' }}>
-            <label className="form-label">To</label>
+          <div className="form-group" style={{ marginBottom: '16px' }}>
+            <label className="form-label">Destination Hub (To)</label>
             <input
               type="text"
               className="form-input"
               style={{ paddingLeft: '14px' }}
-              placeholder="e.g. Railway Station"
+              placeholder="e.g. Trishulia, Cuttack"
               value={to}
               onChange={(e) => setTo(e.target.value)}
               required
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Seats</label>
+              <label className="form-label">Available Slots</label>
               <input
                 type="number"
                 min="1"
+                max="8"
                 className="form-input"
                 style={{ paddingLeft: '14px' }}
                 value={seats}
@@ -267,7 +268,7 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
               />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Price (₹)</label>
+              <label className="form-label">Price Per Seat (₹)</label>
               <input
                 type="number"
                 min="0"
@@ -288,52 +289,65 @@ export default function CarpoolHub({ token, userEmail, onOpenChat }: CarpoolHubP
       )}
 
       {activeTab === 'active' && (
-        <div>
+        <div className="animate-fade-in">
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>Loading my rides...</div>
+            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>Retrieving ride data...</div>
           ) : myActiveRides.length === 0 ? (
-            <div className="empty-state">You have not offered or joined any rides yet.</div>
+            <div className="empty-state">No offered or joined rides registered under this profile.</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {myActiveRides.map(ride => {
                 const isDriver = ride.driver === userEmail;
                 return (
-                  <div key={ride._id} className="history-item" style={{ cursor: 'default' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>
-                        {ride.from} → {ride.to}
+                  <div key={ride._id} className="history-item animate-slide-up" style={{ cursor: 'default' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>
+                        🚗 {ride.from} → {ride.to}
                       </span>
                       <span style={{ 
-                        fontSize: '10px', 
-                        padding: '2px 6px', 
+                        fontSize: '9px', 
+                        padding: '3px 8px', 
                         borderRadius: '4px',
-                        background: isDriver ? 'rgba(99, 102, 241, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                        color: isDriver ? 'var(--accent-color)' : 'var(--traffic-low)',
-                        fontWeight: 'bold',
-                        height: 'fit-content'
+                        background: isDriver ? 'rgba(129, 140, 248, 0.15)' : 'rgba(57, 255, 20, 0.15)',
+                        color: isDriver ? 'var(--accent-purple)' : 'var(--traffic-low)',
+                        fontWeight: 800,
+                        height: 'fit-content',
+                        letterSpacing: '0.05em',
+                        border: isDriver ? '1px solid rgba(129, 140, 248, 0.25)' : '1px solid rgba(57, 255, 20, 0.25)'
                       }}>
                         {isDriver ? 'DRIVER' : 'PASSENGER'}
                       </span>
                     </div>
 
-                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-                      {isDriver ? `Riders: ${ride.riders.length > 0 ? ride.riders.join(', ') : 'none'}` : `Driver: ${ride.driver.split('@')[0]}`}
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                      {isDriver ? `👥 Riders: ${ride.riders.length > 0 ? ride.riders.map((r: string) => r.split('@')[0]).join(', ') : 'none'}` : `👤 pilot: ${ride.driver.split('@')[0]}`}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                        Price: ₹{ride.price} • {ride.seats} seats remaining
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }} className="mono-text">
+                        ₹{ride.price} • {ride.seats} seats left
                       </span>
                       <button
                         className="logout-btn"
                         onClick={() => onOpenChat(ride._id, `${ride.from} → ${ride.to}`)}
                         style={{
-                          background: 'rgba(255,255,255,0.05)',
+                          background: 'rgba(0, 240, 255, 0.05)',
+                          borderColor: 'var(--glass-border)',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
-                          padding: '4px 10px',
-                          fontSize: '11px'
+                          padding: '5px 12px',
+                          fontSize: '11px',
+                          color: 'var(--accent-color)',
+                          borderRadius: '6px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--accent-color)';
+                          e.currentTarget.style.background = 'rgba(0, 240, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--glass-border)';
+                          e.currentTarget.style.background = 'rgba(0, 240, 255, 0.05)';
                         }}
                       >
                         <MessageSquare size={12} />

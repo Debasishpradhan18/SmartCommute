@@ -97,55 +97,30 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
       </header>
 
       {/* Odisha Smart Mobility Live Telemetry */}
-      <div style={{
-        background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.05) 0%, rgba(57, 255, 20, 0.02) 100%)',
-        borderBottom: '1px solid var(--glass-border)',
-        padding: '10px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px',
-        zIndex: 5
-      }}>
+      <div className="telemetry-ticker">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{
-            width: '8px',
-            height: '8px',
-            background: 'var(--traffic-low)',
-            borderRadius: '50%',
-            boxShadow: '0 0 8px var(--traffic-low)',
-            display: 'inline-block',
-            animation: 'pulseStatus 2s infinite ease-in-out'
-          }}></span>
-          <style>{`
-            @keyframes pulseStatus {
-              0% { opacity: 0.5; }
-              50% { opacity: 1; }
-              100% { opacity: 0.5; }
-            }
-          `}</style>
-          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
+          <span className="telemetry-dot"></span>
+          <span className="telemetry-label">
             ODISHA TRANSIT GRID: ACTIVE
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>AVG CONGESTION:</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--traffic-medium)' }}>34% (MODERATE)</span>
+        <div className="telemetry-stats">
+          <div className="telemetry-stat-item">
+            <span className="telemetry-stat-title">AVG CONGESTION:</span>
+            <span className="telemetry-stat-value" style={{ color: 'var(--traffic-medium)' }}>34% (MODERATE)</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MONITORED VEHICLES:</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff' }}>4,812</span>
+          <div className="telemetry-stat-item">
+            <span className="telemetry-stat-title">MONITORED VEHICLES:</span>
+            <span className="telemetry-stat-value">4,812</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>CO2 SAVED TODAY:</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--traffic-low)' }}>1,840 kg</span>
+          <div className="telemetry-stat-item">
+            <span className="telemetry-stat-title">CO2 SAVED TODAY:</span>
+            <span className="telemetry-stat-value" style={{ color: 'var(--traffic-low)' }}>1,840 kg</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MO BUS RUNNING:</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-color)' }}>124 Fleet</span>
+          <div className="telemetry-stat-item">
+            <span className="telemetry-stat-title">MO BUS RUNNING:</span>
+            <span className="telemetry-stat-value" style={{ color: 'var(--accent-color)' }}>124 Fleet</span>
           </div>
         </div>
       </div>
@@ -153,75 +128,24 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
       <div className="dashboard-grid">
         <aside className="sidebar-panel">
           {/* Navigation Mode Selectors */}
-          <div style={{
-            display: 'flex',
-            background: 'rgba(0, 0, 0, 0.3)',
-            borderRadius: '10px',
-            padding: '4px',
-            marginBottom: '10px'
-          }}>
+          <div className="auth-tabs" style={{ marginBottom: '14px' }}>
             <button
               onClick={() => setSidebarTab('route')}
-              style={{
-                flex: 1,
-                border: 'none',
-                background: sidebarTab === 'route' ? 'var(--bg-tertiary)' : 'transparent',
-                color: sidebarTab === 'route' ? '#ffffff' : 'var(--text-secondary)',
-                padding: '8px 4px',
-                fontWeight: 600,
-                fontSize: '12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                transition: 'all 0.2s ease'
-              }}
+              className={`auth-tab ${sidebarTab === 'route' ? 'active' : ''}`}
             >
               <Navigation size={13} />
               Route
             </button>
             <button
               onClick={() => setSidebarTab('carpool')}
-              style={{
-                flex: 1,
-                border: 'none',
-                background: sidebarTab === 'carpool' ? 'var(--bg-tertiary)' : 'transparent',
-                color: sidebarTab === 'carpool' ? '#ffffff' : 'var(--text-secondary)',
-                padding: '8px 4px',
-                fontWeight: 600,
-                fontSize: '12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                transition: 'all 0.2s ease'
-              }}
+              className={`auth-tab ${sidebarTab === 'carpool' ? 'active' : ''}`}
             >
               <Users size={13} />
               Carpool
             </button>
             <button
               onClick={() => setSidebarTab('parking')}
-              style={{
-                flex: 1,
-                border: 'none',
-                background: sidebarTab === 'parking' ? 'var(--bg-tertiary)' : 'transparent',
-                color: sidebarTab === 'parking' ? '#ffffff' : 'var(--text-secondary)',
-                padding: '8px 4px',
-                fontWeight: 600,
-                fontSize: '12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                transition: 'all 0.2s ease'
-              }}
+              className={`auth-tab ${sidebarTab === 'parking' ? 'active' : ''}`}
             >
               <MapPin size={13} />
               Parking

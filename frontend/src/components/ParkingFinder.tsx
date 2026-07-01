@@ -148,7 +148,7 @@ export default function ParkingFinder({ token, onSearchSuccess }: ParkingFinderP
       )}
 
       {activeTab === 'find' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }} className="animate-fade-in">
           <form onSubmit={handleSearchParking} className="search-input-wrapper" style={{ marginBottom: 0 }}>
             <Search size={16} className="input-icon-left" style={{ top: '13px' }} />
             <input
@@ -166,34 +166,34 @@ export default function ParkingFinder({ token, onSearchSuccess }: ParkingFinderP
             <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>Searching garages...</div>
           ) : garages.length === 0 ? (
             <div className="empty-state">
-              <Compass size={24} style={{ marginBottom: '8px', color: 'var(--text-muted)' }} />
-              <p>Type a city and search to load smart parking garages.</p>
+              <Compass size={24} style={{ marginBottom: '8px', color: 'var(--accent-purple)', animation: 'pulseStatus 2s infinite ease-in-out' }} />
+              <p>Type an Odisha city (e.g. Bhubaneswar, Cuttack) to inspect smart parking grids.</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '350px', overflowY: 'auto' }}>
-              {garages.map(garage => {
+              {garages.map((garage, idx) => {
                 const ratio = garage.availableSlots / garage.totalSlots;
                 const statusColor = ratio === 0 ? 'var(--traffic-heavy)' :
                                     ratio <= 0.2 ? 'var(--traffic-medium)' :
                                     'var(--traffic-low)';
 
                 return (
-                  <div key={garage._id} className="history-item" style={{ cursor: 'default' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>
-                        {garage.name}
+                  <div key={garage._id} className="history-item animate-slide-up" style={{ cursor: 'default', animationDelay: `${idx * 0.05}s` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>
+                        🅿️ {garage.name}
                       </span>
-                      <span style={{ fontSize: '13px', color: 'var(--traffic-low)', fontWeight: 700 }}>
+                      <span className="mono-text" style={{ fontSize: '13px', color: 'var(--accent-color)', fontWeight: 800 }}>
                         ₹{garage.price.toFixed(2)}/hr
                       </span>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <MapPin size={12} />
+                        <MapPin size={12} style={{ color: 'var(--accent-purple)' }} />
                         {garage.city.toUpperCase()}
                       </span>
-                      <span style={{ color: statusColor, fontWeight: 700 }}>
+                      <span style={{ color: statusColor, fontWeight: 800 }} className="mono-text">
                         {garage.availableSlots} / {garage.totalSlots} slots free
                       </span>
                     </div>
@@ -204,30 +204,35 @@ export default function ParkingFinder({ token, onSearchSuccess }: ParkingFinderP
                       height: '4px', 
                       background: 'rgba(255,255,255,0.05)', 
                       borderRadius: '2px', 
-                      marginBottom: '12px',
+                      marginBottom: '14px',
                       overflow: 'hidden'
                     }}>
                       <div style={{ 
                         width: `${(garage.availableSlots / garage.totalSlots) * 100}%`, 
                         height: '100%', 
                         background: statusColor, 
-                        transition: 'width 0.5s ease' 
+                        transition: 'width 0.5s ease',
+                        boxShadow: `0 0 6px ${statusColor}`
                       }}></div>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <button
-                        className="logout-btn"
+                        className="plan-btn"
                         disabled={garage.availableSlots <= 0}
                         onClick={() => handleReserveSpot(garage._id)}
                         style={{
+                          width: 'auto',
                           background: garage.availableSlots <= 0 ? 'rgba(255,255,255,0.05)' : 'var(--accent-color)',
-                          borderColor: 'transparent',
-                          padding: '4px 14px',
+                          padding: '6px 14px',
                           fontSize: '11px',
-                          fontWeight: 700,
-                          color: garage.availableSlots <= 0 ? 'var(--text-muted)' : '#FFFFFF',
-                          cursor: garage.availableSlots <= 0 ? 'not-allowed' : 'pointer'
+                          fontWeight: 800,
+                          color: garage.availableSlots <= 0 ? 'var(--text-muted)' : '#050811',
+                          cursor: garage.availableSlots <= 0 ? 'not-allowed' : 'pointer',
+                          boxShadow: 'none',
+                          borderRadius: '6px',
+                          textTransform: 'uppercase',
+                          fontFamily: 'var(--font-mono)'
                         }}
                       >
                         {garage.availableSlots <= 0 ? 'Fully Booked' : 'Reserve Spot'}
@@ -242,42 +247,42 @@ export default function ParkingFinder({ token, onSearchSuccess }: ParkingFinderP
       )}
 
       {activeTab === 'reservations' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} className="animate-fade-in">
           {reservations.length === 0 ? (
-            <div className="empty-state">You have no active parking reservations.</div>
+            <div className="empty-state">No active smart parking reservations registered on grid.</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflowY: 'auto' }}>
-              {reservations.map(res => (
-                <div key={res._id} className="parking-ticket glass-panel" style={{
-                  padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid var(--glass-border)',
-                  borderLeft: '4px solid var(--accent-color)',
-                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(255,255,255,0.02))'
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '400px', overflowY: 'auto' }}>
+              {reservations.map((res, idx) => (
+                <div key={res._id} className="parking-ticket animate-slide-up" style={{
+                  padding: '16px 20px',
+                  animationDelay: `${idx * 0.05}s`
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>
                       {res.garageName}
                     </span>
                     <Ticket size={16} style={{ color: 'var(--accent-color)' }} />
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px', fontSize: '11px', color: 'var(--text-secondary)' }}>
                     <div>
-                      <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Spot Number</div>
-                      <div style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff' }}>{res.slotNumber}</div>
+                      <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Spot Assignment</div>
+                      <div className="mono-text" style={{ fontSize: '16px', fontWeight: 800, color: 'var(--traffic-low)' }}>{res.slotNumber}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Ticket Code</div>
-                      <div style={{ fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, color: 'var(--accent-color)' }}>
+                      <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Grid Ticket ID</div>
+                      <div style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--accent-color)', marginTop: '2px' }}>
                         #{res._id ? res._id.slice(-6).toUpperCase() : 'CODE'}
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed var(--glass-border)', paddingTop: '10px' }}>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Calendar size={12} />
+                  {/* Aesthetic barcode */}
+                  <div className="barcode-strip"></div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.08)', paddingTop: '10px', marginTop: '6px' }}>
+                    <span style={{ fontSize: '10px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)' }}>
+                      <Calendar size={12} style={{ color: 'var(--accent-purple)' }} />
                       {new Date(res.createdAt).toLocaleDateString()}
                     </span>
                     <button
@@ -291,8 +296,12 @@ export default function ParkingFinder({ token, onSearchSuccess }: ParkingFinderP
                         alignItems: 'center',
                         gap: '4px',
                         fontSize: '11px',
-                        fontWeight: 600
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        fontFamily: 'var(--font-mono)'
                       }}
+                      onMouseEnter={(e) => (e.currentTarget.style.textShadow = '0 0 6px var(--traffic-heavy)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.textShadow = 'none')}
                     >
                       <Trash2 size={12} />
                       Cancel

@@ -198,22 +198,23 @@ export default function RouteSearch({
       {recentSearches.length > 0 && (
         <div style={{ marginTop: '24px' }}>
           <h4 className="section-title">
-            <History size={16} />
+            <History size={16} style={{ color: 'var(--accent-purple)' }} />
             Recent Commutes
           </h4>
-          <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }}>
+          <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }} className="animate-fade-in">
             {recentSearches.map((item, idx) => (
               <div
                 key={item._id || idx}
-                className="history-item"
+                className="history-item animate-slide-up"
                 onClick={() => {
                   setSource(item.source);
                   setDestination(item.destination);
                   handlePlanRoute(item.source, item.destination);
                 }}
+                style={{ animationDelay: `${idx * 0.05}s` }}
               >
                 <div className="history-locations">
-                  {item.source.split(',')[0]} → {item.destination.split(',')[0]}
+                  🗺️ {item.source.split(',')[0]} → {item.destination.split(',')[0]}
                 </div>
                 <div className="history-meta">
                   <span>{item.distance} km • {item.duration} mins</span>
@@ -222,11 +223,12 @@ export default function RouteSearch({
                       color: item.trafficLevel === 'low' ? 'var(--traffic-low)' : 
                              item.trafficLevel === 'medium' ? 'var(--traffic-medium)' : 
                              'var(--traffic-heavy)',
-                      textTransform: 'capitalize',
-                      fontWeight: 600
+                      textTransform: 'uppercase',
+                      fontWeight: 700,
+                      fontSize: '10px'
                     }}
                   >
-                    {item.trafficLevel} Traffic
+                    ⚡ {item.trafficLevel}
                   </span>
                 </div>
               </div>
