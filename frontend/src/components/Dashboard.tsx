@@ -269,6 +269,7 @@ export default function Dashboard({ user, token, onLogout }: DashboardProps) {
               routes={routeData ? routeData.routes : []}
               selectedRouteIndex={selectedRouteIdx}
               onSelectRoute={setSelectedRouteIdx}
+              weather={routeData ? routeData.weather : null}
             />
           )}
 

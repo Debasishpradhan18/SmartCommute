@@ -108,6 +108,80 @@ async function geocodeAddress(query) {
   };
 }
 
+// Fetch weather from Open-Meteo or fall back to seasonal mock weather
+async function getWeather(coords) {
+  const [lat, lon] = coords;
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('API response error');
+    const data = await response.json();
+    if (data && data.current_weather) {
+      const temp = data.current_weather.temperature;
+      const code = data.current_weather.weathercode;
+      const wind = data.current_weather.windspeed;
+      
+      let condition = 'Clear Sky';
+      let icon = '☀️';
+      let warning = '';
+      
+      if (code === 0) { condition = 'Clear Sky'; icon = '☀️'; }
+      else if (code >= 1 && code <= 3) { condition = 'Partly Cloudy'; icon = '⛅'; }
+      else if (code >= 45 && code <= 48) { condition = 'Foggy'; icon = '🌫️'; warning = 'Fog alert: Reduced visibility on roads. Drive slowly and use fog lights.'; }
+      else if (code >= 51 && code <= 67) { condition = 'Rainy'; icon = '🌧️'; warning = 'Rain advisory: Wet and slippery highway surfaces. Maintain safe braking distance.'; }
+      else if (code >= 71 && code <= 77) { condition = 'Snowy'; icon = '❄️'; }
+      else if (code >= 80 && code <= 82) { condition = 'Rain Showers'; icon = '🌦️'; warning = 'Slippery roads: Slow down around sharp turns.'; }
+      else if (code >= 95 && code <= 99) { condition = 'Thunderstorm'; icon = '⛈️'; warning = 'Severe Storm: Risk of localized waterlogging and strong winds. Avoid low-lying transit underpasses.'; }
+      
+      if (wind > 35 && !warning) {
+        warning = `High Winds: Wind speed of ${wind} km/h. Caution for two-wheelers and high-profile vehicles.`;
+      }
+      
+      return {
+        temperature: temp,
+        condition,
+        icon,
+        windspeed: wind,
+        warning
+      };
+    }
+  } catch (err) {
+    console.error('Weather API failed, fallback to mock weather:', err.message);
+  }
+  
+  // Seasonal fallback for Odisha (monsoon, heatwave, etc.)
+  const month = new Date().getMonth(); // 0-11
+  let temp = 30;
+  let condition = 'Sunny';
+  let icon = '☀️';
+  let warning = '';
+  
+  if (month >= 5 && month <= 8) { // Monsoon (June to Sept)
+    temp = 29;
+    condition = 'Monsoon Showers';
+    icon = '🌧️';
+    warning = 'Monsoon advisory: Heavy showers expected. Stay alert for waterlogging on arterial roads.';
+  } else if (month >= 2 && month <= 4) { // Summer (March to May)
+    temp = 38;
+    condition = 'Intense Heatwave';
+    icon = '🔥';
+    warning = 'Heatwave alert: High temperature. Stay hydrated and ensure vehicle coolant levels are topped up.';
+  } else { // Winter (Oct to Feb)
+    temp = 22;
+    condition = 'Clear & Pleasant';
+    icon = '☀️';
+  }
+  
+  return {
+    temperature: temp,
+    condition,
+    icon,
+    windspeed: 12,
+    warning
+  };
+}
+
+
 // Generate route coords path with jitter
 function generateRoutePoints(start, end, jitterCount = 6) {
   const points = [start];
@@ -179,6 +253,8 @@ router.post('/plan', async (req, res) => {
         !isLocationInOdisha(destGeocode.coords, destGeocode.name)) {
       return res.status(400).json({ message: 'Currently SmartCommute supports only Odisha.' });
     }
+
+    const weather = await getWeather(destGeocode.coords);
 
     const baseDistance = getHaversineDistance(sourceGeocode.coords, destGeocode.coords);
 
@@ -365,7 +441,8 @@ router.post('/plan', async (req, res) => {
       routes,
       carpools,
       parking,
-      aiPredictions
+      aiPredictions,
+      weather
     });
   } catch (err) {
     res.status(500).json({ message: 'Error planning route', error: err.message });

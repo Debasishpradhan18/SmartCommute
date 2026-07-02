@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Route, AlertCircle, Car, DollarSign, Star, Compass, Award, Sparkles, TrendingUp, TrendingDown, Clock3 } from 'lucide-react';
+import { Clock, Route, AlertCircle, Car, DollarSign, Star, Compass, Award, Sparkles, TrendingUp, TrendingDown, Clock3, Wind } from 'lucide-react';
 
 interface CommuteDetailsProps {
   route: any | null;
@@ -21,6 +21,13 @@ interface CommuteDetailsProps {
   routes: any[];
   selectedRouteIndex: number;
   onSelectRoute: (index: number) => void;
+  weather?: {
+    temperature: number;
+    condition: string;
+    icon: string;
+    windspeed: number;
+    warning?: string;
+  } | null;
 }
 
 export default function CommuteDetails({ 
@@ -30,7 +37,8 @@ export default function CommuteDetails({
   aiPredictions,
   routes,
   selectedRouteIndex,
-  onSelectRoute
+  onSelectRoute,
+  weather
 }: CommuteDetailsProps) {
   const [activeTab, setActiveTab] = useState<'info' | 'carpool' | 'parking' | 'ai'>('info');
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -198,6 +206,53 @@ export default function CommuteDetails({
               </div>
             </div>
           </div>
+
+          {weather && (
+            <div style={{ 
+              background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.03), rgba(129, 140, 248, 0.03))',
+              padding: '14px', 
+              borderRadius: '10px',
+              border: '1px solid rgba(0, 240, 255, 0.12)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '24px', filter: 'drop-shadow(0 0 6px var(--accent-glow))' }}>{weather.icon}</span>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>Destination Weather</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{weather.condition}</div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--accent-color)', fontFamily: 'var(--font-mono)' }}>{weather.temperature}°C</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', marginTop: '2px' }}>
+                    <Wind size={12} style={{ color: 'var(--accent-purple)' }} />
+                    <span className="mono-text">{weather.windspeed} km/h</span>
+                  </div>
+                </div>
+              </div>
+
+              {weather.warning && (
+                <div style={{ 
+                  background: 'rgba(234, 179, 8, 0.06)',
+                  border: '1px solid rgba(234, 179, 8, 0.15)',
+                  borderRadius: '6px',
+                  padding: '8px 12px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '8px',
+                  marginTop: '2px'
+                }}>
+                  <AlertCircle size={14} style={{ color: 'var(--traffic-medium)', flexShrink: 0, marginTop: '1px' }} />
+                  <div style={{ fontSize: '10.5px', color: '#ffd043', lineHeight: '1.4', fontWeight: 500 }}>
+                    {weather.warning}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ 
             background: 'linear-gradient(135deg, rgba(57, 255, 20, 0.04), rgba(0, 240, 255, 0.03))',
